@@ -1,0 +1,53 @@
+import re
+
+class IncorrectDataFormatException(Exception):
+    pass
+
+class IncorrectDataAmountException(Exception):
+    pass
+
+def parse_input_data(input_string):
+    input_data = input_string.strip().split(' ')
+    if len(input_data) != 6:
+        raise IncorrectDataAmountException('Incorrect amount of input data')
+    
+    last_name, first_name, middle_name, birth_date, phone_number, gender = input_data
+    
+    # Check last name, first name, and middle name format
+    if not all(re.match(r'^[a-zA-Zа-яА-Я]+$', name) for name in (last_name, first_name, middle_name)):
+        raise IncorrectDataFormatException('Incorrect name format')
+    
+    # Check birth date format
+    if not re.match(r'^\d{2}\.\d{2}\.\d{4}$', birth_date):
+        raise IncorrectDataFormatException('Incorrect birth date format')
+    
+    # Check phone number format
+    if not re.match(r'^\d+$', phone_number):
+        raise IncorrectDataFormatException('Incorrect phone number format')
+    
+    # Check gender format
+    if not gender in ('f', 'm'):
+        raise IncorrectDataFormatException('Incorrect gender format')
+    
+    return last_name, first_name, middle_name, birth_date, phone_number, gender
+
+def save_to_file(data):
+    last_name, _, _, _, _, _ = data
+    with open(f'{last_name}.txt', 'a') as f:
+        f.write(' '.join(data) + '\n')
+
+def main():
+    input_string = input('Enter data: ')
+    try:
+        data = parse_input_data(input_string)
+    except (IncorrectDataFormatException, IncorrectDataAmountException) as e:
+        print(f'Error: {e}')
+        return
+    
+    try:
+        save_to_file(data)
+    except Exception as e:
+        print(f'Error while saving data to file: {e}')
+
+if __name__ == '__main__':
+    main()
